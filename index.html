@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>全科错题本 · 下载</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:white;border-radius:20px;padding:28px 20px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.logo{font-size:48px;margin-bottom:12px}
+h1{font-size:22px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
+.sub{font-size:13px;color:#888;margin-bottom:16px}
+.invite-box{background:#f0f4ff;border-radius:12px;padding:12px;margin-bottom:16px}
+.invite-label{font-size:11px;color:#999;margin-bottom:4px}
+.invite-code{font-size:22px;font-weight:800;letter-spacing:3px;color:#4c51bf;font-family:'SF Mono','Menlo','Consolas',monospace;margin:6px 0}
+.invite-hint{font-size:11px;color:#aaa;margin-top:4px}
+.os-badge{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:16px}
+.btns{display:flex;flex-direction:column;gap:10px}
+.btn{display:block;padding:14px;border-radius:12px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;-webkit-tap-highlight-color:transparent;transition:all 0.2s;cursor:pointer}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:white;box-shadow:0 4px 15px rgba(102,126,234,.4)}
+.btn-primary:active{transform:scale(.98)}
+.btn-outline{border:2px solid #e0e0e0;color:#555}
+.btn-outline:active{background:#f5f5f5}
+.btn-apple{background:#000;color:white}
+.btn-harmony{background:#e52d27;color:white}
+.copy-btn{display:inline-block;background:transparent;border:1px solid #4c51bf;color:#4c51bf;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;margin-top:8px}
+.copy-btn:active{background:#f0f4ff}
+.features{display:flex;justify-content:center;gap:16px;margin-top:16px;flex-wrap:wrap}
+.feature{display:flex;align-items:center;gap:4px;font-size:11px;color:#999}
+.footer{margin-top:16px;font-size:11px;color:#bbb;line-height:1.6}
+.error-msg{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-top:12px;font-size:12px;color:#856404;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">📖</div>
+  <h1>全科错题本</h1>
+  <p class="sub">AI拍照录入 · 全科智能解析 · 举一反三</p>
+
+  <div class="invite-box" id="inviteBox">
+    <div class="invite-label" id="inviteTitle">📲 扫一扫 或 点击下载</div>
+    <div class="invite-code" id="inviteCode"></div>
+    <div class="invite-hint" id="inviteHint">注册即享7天免费体验会员</div>
+    <button class="copy-btn" id="copyBtn" onclick="copyCode()" style="display:none">📋 复制邀请码</button>
+  </div>
+
+  <div class="os-badge" id="osBadge">🤖 Android 安卓</div>
+
+  <div class="btns" id="btns">
+    <a class="btn btn-primary" id="primaryBtn" href="#" onclick="trackDownload()">
+      ⬇️ 立即下载
+    </a>
+    <a class="btn btn-harmony" id="harmonyBtn" href="#" style="display:none" onclick="trackDownload('harmony')">
+      ⬇️ 鸿蒙 HarmonyOS 下载
+    </a>
+    <a class="btn btn-apple" id="appleBtn" href="#" style="display:none" onclick="trackDownload('ios')">
+      🍎 iOS TestFlight 内测
+    </a>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="features">
+    <span class="feature">🤖 AI识别</span>
+    <span class="feature">📝 全科支持</span>
+    <span class="feature">📤 PDF导出</span>
+    <span class="feature">🔄 举一反三</span>
+  </div>
+
+  <p class="footer">下载后输入邀请码注册，即享7天免费会员<br>如遇无法下载请联系客服</p>
+</div>
+
+<script>
+// ═══ Config ═══════════════════════════════════════════
+var INVITE_CODE = '';
+// GitHub Releases APK direct download link (upload APK via GitHub Releases)
+var APK_URL = 'https://github.com/chenedwin26/cuotiben/releases/latest/download/全科错题本.apk';
+// 备用：51acquire 直链
+var APK_BACKUP = 'https://51acquire.com/dl/全科错题本.apk';
+
+// ═══ Platform Detection ═══════════════════════════════
+function getPlatform() {
+  var ua = (navigator.userAgent || '').toLowerCase();
+  if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) return 'ios';
+  if (ua.indexOf('harmonyos') > -1 || ua.indexOf('openharmony') > -1) return 'harmony';
+  return 'android';
+}
+
+function getOSLabel(p) {
+  if (p === 'ios') return '🍎 iOS / Apple';
+  if (p === 'harmony') return '🚀 鸿蒙 HarmonyOS';
+  return '🤖 Android 安卓';
+}
+
+// ═══ Init ═════════════════════════════════════════════
+(function(){
+  // Read invite code from URL
+  var params = new URLSearchParams(window.location.search);
+  INVITE_CODE = (params.get('code') || params.get('invite') || '').trim().toUpperCase();
+
+  var platform = getPlatform();
+  document.getElementById('osBadge').textContent = getOSLabel(platform);
+
+  // Show relevant download buttons
+  var primaryBtn = document.getElementById('primaryBtn');
+  var harmonyBtn = document.getElementById('harmonyBtn');
+  var appleBtn = document.getElementById('appleBtn');
+
+  if (platform === 'ios') {
+    primaryBtn.href = 'https://testflight.apple.com/join/placeholder';
+    primaryBtn.textContent = '🍎 加入 TestFlight 内测';
+    primaryBtn.className = 'btn btn-apple';
+    harmonyBtn.style.display = 'block';
+    harmonyBtn.href = APK_URL;
+    appleBtn.style.display = 'none';
+  } else if (platform === 'harmony') {
+    primaryBtn.href = APK_URL;
+    primaryBtn.textContent = '⬇️ 立即下载 · 鸿蒙版';
+    primaryBtn.className = 'btn btn-harmony';
+    harmonyBtn.style.display = 'none';
+    appleBtn.style.display = 'block';
+    appleBtn.href = APK_URL;
+    appleBtn.textContent = '🤖 Android APK 下载';
+    appleBtn.className = 'btn btn-primary';
+  } else {
+    // Android default
+    primaryBtn.href = APK_URL;
+    primaryBtn.textContent = '⬇️ 立即下载 · Android 版';
+    harmonyBtn.style.display = 'block';
+    harmonyBtn.href = APK_URL;
+    appleBtn.style.display = 'block';
+    appleBtn.href = APK_BACKUP;
+    appleBtn.textContent = '⬇️ 备用下载链接';
+    appleBtn.className = 'btn btn-outline';
+  }
+
+  // Show invite code
+  if (INVITE_CODE && INVITE_CODE.length >= 6) {
+    document.getElementById('inviteTitle').textContent = '🎁 好友邀请你加入';
+    document.getElementById('inviteCode').textContent = INVITE_CODE;
+    document.getElementById('inviteCode').style.display = 'block';
+    document.getElementById('inviteHint').textContent = '下载App后输入此邀请码注册，即享7天会员';
+    document.getElementById('copyBtn').style.display = 'inline-block';
+  } else {
+    document.getElementById('inviteCode').style.display = 'none';
+    document.getElementById('copyBtn').style.display = 'none';
+  }
+})();
+
+// ═══ Actions ══════════════════════════════════════════
+function copyCode() {
+  if (INVITE_CODE) {
+    navigator.clipboard.writeText(INVITE_CODE).then(function() {
+      var btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ 已复制!';
+      setTimeout(function(){ btn.textContent = '📋 复制邀请码'; }, 2000);
+    });
+  }
+}
+
+function trackDownload(platform) {
+  // Fire-and-forget analytics
+  try {
+    var p = platform || getPlatform();
+    fetch('https://51acquire.com/api/dl-track?platform=' + p + '&invite=' + INVITE_CODE, {method:'POST'});
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
