@@ -29,10 +29,28 @@ h1{font-size:22px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
 .features{display:flex;justify-content:center;gap:16px;margin-top:16px;flex-wrap:wrap}
 .feature{display:flex;align-items:center;gap:4px;font-size:11px;color:#999}
 .footer{margin-top:16px;font-size:11px;color:#bbb;line-height:1.6}
-.error-msg{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-top:12px;font-size:12px;color:#856404;display:none}
+
+/* ═══ WeChat Tip Overlay ═══ */
+.wx-tip-overlay{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a1a2e;color:white;text-align:center;padding:18px 16px 22px;font-size:15px;line-height:1.8;animation:slideDown .4s ease}
+.wx-tip-overlay.show{display:block}
+.wx-tip-arrow{font-size:28px;animation:bounce 1s infinite}
+@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+.wx-tip-overlay .btn-close{position:absolute;right:12px;top:8px;background:none;border:none;color:white;font-size:22px;cursor:pointer;opacity:.7}
 </style>
 </head>
 <body>
+
+<!-- ═══ WeChat 引导遮罩 ═══ -->
+<div class="wx-tip-overlay" id="wxTip">
+  <button class="btn-close" onclick="document.getElementById('wxTip').classList.remove('show')">✕</button>
+  <div style="font-size:17px;font-weight:700;margin-bottom:6px">⚠️ 微信内无法直接下载</div>
+  <div>请点击右上角 <span style="font-size:20px">···</span> 菜单</div>
+  <div>选择 <strong>「在浏览器中打开」</strong></div>
+  <div class="wx-tip-arrow">↗️</div>
+  <div style="font-size:12px;opacity:.7;margin-top:4px">或复制链接到手机浏览器打开</div>
+</div>
+
 <div class="card">
   <div class="logo">📖</div>
   <h1>全科错题本</h1>
@@ -59,8 +77,6 @@ h1{font-size:22px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
     </a>
   </div>
 
-  <div class="error-msg" id="errorMsg"></div>
-
   <div class="features">
     <span class="feature">🤖 AI识别</span>
     <span class="feature">📝 全科支持</span>
@@ -68,18 +84,20 @@ h1{font-size:22px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
     <span class="feature">🔄 举一反三</span>
   </div>
 
-  <p class="footer">下载后输入邀请码注册，即享7天免费会员<br>如遇无法下载请联系客服</p>
+  <p class="footer">下载后输入邀请码注册，即享7天免费会员</p>
 </div>
 
 <script>
 // ═══ Config ═══════════════════════════════════════════
 var INVITE_CODE = '';
-// GitHub Releases APK 直链（自动跟随最新版本）
 var APK_URL = 'https://github.com/chenedwin26/cuotiben/releases/latest/download/cuotiben-v2.0.0.apk';
-// 备用：51acquire 直链
-var APK_BACKUP = 'https://51acquire.com/dl/全科错题本.apk';
 
-// ═══ Platform Detection ═══════════════════════════════
+// ═══ WeChat Detection ═════════════════════════════════
+function isWeChat() {
+  var ua = (navigator.userAgent || '').toLowerCase();
+  return ua.indexOf('micromessenger') > -1;
+}
+
 function getPlatform() {
   var ua = (navigator.userAgent || '').toLowerCase();
   if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1) return 'ios';
@@ -100,16 +118,33 @@ function getOSLabel(p) {
   INVITE_CODE = (params.get('code') || params.get('invite') || '').trim().toUpperCase();
 
   var platform = getPlatform();
+  var inWx = isWeChat();
   document.getElementById('osBadge').textContent = getOSLabel(platform);
+
+  // ═══ WeChat: show tip ═══
+  if (inWx) {
+    document.getElementById('wxTip').classList.add('show');
+  }
 
   // Show relevant download buttons
   var primaryBtn = document.getElementById('primaryBtn');
   var harmonyBtn = document.getElementById('harmonyBtn');
   var appleBtn = document.getElementById('appleBtn');
 
-  if (platform === 'ios') {
-    primaryBtn.href = 'https://testflight.apple.com/join/placeholder';
-    primaryBtn.textContent = '🍎 加入 TestFlight 内测';
+  if (inWx) {
+    // In WeChat: all buttons become "copy link" prompts
+    primaryBtn.href = 'javascript:void(0)';
+    primaryBtn.textContent = '📋 复制链接到浏览器打开';
+    primaryBtn.onclick = function(){ copyPageUrl(); return false; };
+    harmonyBtn.style.display = 'none';
+    appleBtn.style.display = 'block';
+    appleBtn.href = 'javascript:void(0)';
+    appleBtn.textContent = '📋 复制备用下载链接';
+    appleBtn.className = 'btn btn-outline';
+    appleBtn.onclick = function(){ copyApkUrl(); return false; };
+  } else if (platform === 'ios') {
+    primaryBtn.href = APK_URL;
+    primaryBtn.textContent = '🍎 iOS 下载 (APK)';
     primaryBtn.className = 'btn btn-apple';
     harmonyBtn.style.display = 'block';
     harmonyBtn.href = APK_URL;
@@ -122,17 +157,13 @@ function getOSLabel(p) {
     appleBtn.style.display = 'block';
     appleBtn.href = APK_URL;
     appleBtn.textContent = '🤖 Android APK 下载';
-    appleBtn.className = 'btn btn-primary';
+    appleBtn.className = 'btn btn-outline';
   } else {
-    // Android default
     primaryBtn.href = APK_URL;
     primaryBtn.textContent = '⬇️ 立即下载 · Android 版';
     harmonyBtn.style.display = 'block';
     harmonyBtn.href = APK_URL;
-    appleBtn.style.display = 'block';
-    appleBtn.href = APK_BACKUP;
-    appleBtn.textContent = '⬇️ 备用下载链接';
-    appleBtn.className = 'btn btn-outline';
+    appleBtn.style.display = 'none';
   }
 
   // Show invite code
@@ -159,8 +190,24 @@ function copyCode() {
   }
 }
 
+function copyPageUrl() {
+  var url = window.location.href;
+  navigator.clipboard.writeText(url).then(function() {
+    alert('链接已复制！\n\n请粘贴到手机浏览器（如 Chrome、Safari）中打开下载。');
+  }).catch(function() {
+    prompt('请手动复制以下链接，粘贴到浏览器打开：', url);
+  });
+}
+
+function copyApkUrl() {
+  navigator.clipboard.writeText(APK_URL).then(function() {
+    alert('下载链接已复制！\n\n请粘贴到手机浏览器中打开下载。');
+  }).catch(function() {
+    prompt('请手动复制以下链接，粘贴到浏览器打开：', APK_URL);
+  });
+}
+
 function trackDownload(platform) {
-  // Fire-and-forget analytics
   try {
     var p = platform || getPlatform();
     fetch('https://51acquire.com/api/dl-track?platform=' + p + '&invite=' + INVITE_CODE, {method:'POST'});
