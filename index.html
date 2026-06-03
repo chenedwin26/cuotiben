@@ -139,31 +139,42 @@ function getOSLabel(p) {
     harmonyBtn.style.display = 'none';
     appleBtn.style.display = 'block';
     appleBtn.href = 'javascript:void(0)';
-    appleBtn.textContent = '📋 复制备用下载链接';
+    appleBtn.textContent = '📋 复制下载链接';
     appleBtn.className = 'btn btn-outline';
     appleBtn.onclick = function(){ copyApkUrl(); return false; };
   } else if (platform === 'ios') {
-    primaryBtn.href = APK_URL;
-    primaryBtn.textContent = '🍎 iOS 下载 (APK)';
+    primaryBtn.href = '#';
+    primaryBtn.textContent = '🍎 iOS 版本（正在开发中）';
     primaryBtn.className = 'btn btn-apple';
+    primaryBtn.onclick = function(e){ e.preventDefault(); };
     harmonyBtn.style.display = 'block';
-    harmonyBtn.href = APK_URL;
+    harmonyBtn.textContent = '🚀 鸿蒙 HarmonyOS（正在开发中）';
+    harmonyBtn.href = '#';
+    harmonyBtn.onclick = function(e){ e.preventDefault(); };
     appleBtn.style.display = 'none';
   } else if (platform === 'harmony') {
-    primaryBtn.href = APK_URL;
-    primaryBtn.textContent = '⬇️ 立即下载 · 鸿蒙版';
+    primaryBtn.href = '#';
+    primaryBtn.textContent = '🚀 鸿蒙 HarmonyOS（正在开发中）';
     primaryBtn.className = 'btn btn-harmony';
+    primaryBtn.onclick = function(e){ e.preventDefault(); };
     harmonyBtn.style.display = 'none';
     appleBtn.style.display = 'block';
-    appleBtn.href = APK_URL;
-    appleBtn.textContent = '🤖 Android APK 下载';
-    appleBtn.className = 'btn btn-outline';
+    appleBtn.textContent = '🍎 苹果iOS下载（正在开发中）';
+    appleBtn.className = 'btn btn-apple';
+    appleBtn.href = '#';
+    appleBtn.onclick = function(e){ e.preventDefault(); };
   } else {
     primaryBtn.href = APK_URL;
     primaryBtn.textContent = '⬇️ 立即下载 · Android 版';
     harmonyBtn.style.display = 'block';
-    harmonyBtn.href = APK_URL;
-    appleBtn.style.display = 'none';
+    harmonyBtn.textContent = '🚀 鸿蒙 HarmonyOS（正在开发中）';
+    harmonyBtn.href = '#';
+    harmonyBtn.onclick = function(e){ e.preventDefault(); };
+    appleBtn.style.display = 'block';
+    appleBtn.textContent = '🍎 苹果iOS下载（正在开发中）';
+    appleBtn.className = 'btn btn-apple';
+    appleBtn.href = '#';
+    appleBtn.onclick = function(e){ e.preventDefault(); };
   }
 
   // Show invite code
