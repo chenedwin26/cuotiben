@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>全科错题本 · 下载</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:white;border-radius:20px;padding:28px 20px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.logo{font-size:48px;margin-bottom:12px}
+h1{font-size:22px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
+.sub{font-size:13px;color:#888;margin-bottom:16px}
+.invite-box{background:#f0f4ff;border-radius:12px;padding:12px;margin-bottom:16px}
+.invite-label{font-size:11px;color:#999}
+.invite-code{font-size:22px;font-weight:800;letter-spacing:3px;color:#4c51bf;font-family:monospace;margin:6px 0}
+.invite-hint{font-size:11px;color:#aaa}
+.btns{display:flex;flex-direction:column;gap:10px}
+.btn{display:block;padding:14px;border-radius:12px;font-size:15px;font-weight:700;text-align:center;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.btn-android{background:linear-gradient(135deg,#667eea,#764ba2);color:white}
+.btn-android:active{opacity:.8}
+.btn-ios{background:#222;color:white}
+.btn-harmony{background:#e52d27;color:white}
+.btn-light{background:#f5f5f5;color:#555;border:1px solid #eee}
+.footer{margin-top:16px;font-size:11px;color:#bbb;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">📖</div>
+  <h1>全科错题本</h1>
+  <p class="sub">AI拍照录入 · 全科智能解析 · 举一反三</p>
+
+  <div class="invite-box" id="inviteBox">
+    <div class="invite-label" id="inviteTitle">📲 扫码下载全科错题本</div>
+    <div class="invite-code" id="inviteCode"></div>
+    <div class="invite-hint" id="inviteHint">注册即享7天免费体验会员</div>
+  </div>
+
+  <div class="btns">
+    <a class="btn btn-android" href="https://raw.githubusercontent.com/chenedwin26/cuotiben/main/cuotiben.apk">⬇️ Android / 安卓 下载 (APK)</a>
+    <a class="btn btn-harmony" href="https://raw.githubusercontent.com/chenedwin26/cuotiben/main/cuotiben.apk">⬇️ 鸿蒙 HarmonyOS 下载</a>
+    <a class="btn btn-ios btn-light" href="#">🍎 iOS 版本开发中</a>
+  </div>
+
+  <p class="footer">51acquire.com/dl · 如遇无法下载请联系客服</p>
+</div>
+
+<script>
+(function(){
+  var code = new URLSearchParams(window.location.search).get('code') || '';
+  if (code && code.length >= 10) {
+    document.getElementById('inviteTitle').textContent = '好友邀请你加入';
+    document.getElementById('inviteCode').textContent = code;
+    document.getElementById('inviteHint').textContent = '下载App后输入此邀请码注册，即享7天会员';
+  } else {
+    document.getElementById('inviteCode').style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>
